@@ -1,0 +1,31 @@
+// Everybody Codes @EVENT@ - Quest @QUEST@
+// Approach write-up: NOTES.md in this folder.
+
+#include "@NS@.h"
+
+namespace @NS@ {
+
+// Shared parsing and core logic. The three parts usually build on one idea
+// and scale it up, so keep part1..3 thin and test the pieces from here.
+
+}  // namespace @NS@
+
+namespace {
+
+using namespace @NS@;
+
+vmc::Answer part1([[maybe_unused]] std::string_view input) {
+    return {};
+}
+
+vmc::Answer part2([[maybe_unused]] std::string_view input) {
+    return {};
+}
+
+vmc::Answer part3([[maybe_unused]] std::string_view input) {
+    return {};
+}
+
+}  // namespace
+
+VMC_QUEST("@EVENT@", @QUEST@, part1, part2, part3)

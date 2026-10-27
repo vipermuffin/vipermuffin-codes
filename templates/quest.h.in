@@ -1,0 +1,10 @@
+#pragma once
+// Everybody Codes @EVENT@ - Quest @QUEST@
+// Declare the pieces you want to unit test (input type, parse(), one step, ...)
+// and define them in @NS@.cpp inside the same namespace.
+
+#include "vmc/vmc.h"
+
+namespace @NS@ {
+
+}  // namespace @NS@

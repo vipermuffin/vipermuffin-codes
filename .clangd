@@ -1,0 +1,7 @@
+# Quest templates contain @PLACEHOLDER@ tokens; keep highlighting, skip diagnostics.
+If:
+  PathMatch: templates/.*
+CompileFlags:
+  Add: [-ferror-limit=0]   # else "too many errors" is fatal and can't be suppressed
+Diagnostics:
+  Suppress: "*"

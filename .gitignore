@@ -1,0 +1,11 @@
+build*/
+.cache/
+compile_commands.json
+__pycache__/
+.venv/
+.DS_Store
+
+# Your personal puzzle notes (inputs) stay local; the sample quest's are fine to share.
+notes_p*.txt
+puzzle_p*.html
+!events/sample/**/notes_p*.txt

@@ -1,0 +1,35 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build release",
+      "type": "shell",
+      "command": "cmake --preset release && cmake --build --preset release",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "build debug",
+      "type": "shell",
+      "command": "cmake --preset debug && cmake --build --preset debug",
+      "group": "build",
+      "problemMatcher": ["$gcc"]
+    },
+    {
+      "label": "new quest",
+      "type": "shell",
+      "command": "python3 tools/new_quest.py ${input:event} ${input:quest} --fetch",
+      "problemMatcher": []
+    },
+    {
+      "label": "fetch notes",
+      "type": "shell",
+      "command": "python3 tools/fetch.py ${input:event} ${input:quest}",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    { "id": "event", "type": "promptString", "description": "Event", "default": "2026" },
+    { "id": "quest", "type": "promptString", "description": "Quest number" }
+  ]
+}

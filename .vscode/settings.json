@@ -1,0 +1,21 @@
+{
+  // CMake Tools: pick release/debug from the status bar; presets come from CMakePresets.json.
+  "cmake.useCMakePresets": "always",
+  "cmake.configureOnOpen": true,
+
+  // clangd reads ./compile_commands.json, a link CMake points at the last configured build.
+  "clangd.arguments": ["--header-insertion=never"],
+  "C_Cpp.intelliSenseEngine": "disabled",
+
+  // C++ TestMate: googletest tree in the Testing sidebar.
+  "testMate.cpp.test.executables": "{build,build-debug}/vmc_tests",
+
+  // Python tools use the repo-local venv.
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+
+  "files.associations": { "*.in": "cpp" },
+  "editor.formatOnSave": false,
+
+  //github copilot
+  "editor.inlineSuggest.enabled": false
+}

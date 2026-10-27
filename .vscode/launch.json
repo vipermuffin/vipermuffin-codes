@@ -1,0 +1,29 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Debug build has sanitizers on, so out-of-bounds bugs stop right where they happen.
+      "name": "Debug quest",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-debug/vmc",
+      "args": ["${input:event}", "${input:quest}", "${input:part}"],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build debug"
+    },
+    {
+      "name": "Debug tests (current quest)",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${workspaceFolder}/build-debug/vmc_tests",
+      "args": ["--gtest_filter=*Quest${input:quest}*"],
+      "cwd": "${workspaceFolder}",
+      "preLaunchTask": "build debug"
+    }
+  ],
+  "inputs": [
+    { "id": "event", "type": "promptString", "description": "Event", "default": "2026" },
+    { "id": "quest", "type": "promptString", "description": "Quest number (two digits for tests, e.g. 03)" },
+    { "id": "part", "type": "pickString", "description": "Part", "options": ["1", "2", "3"] }
+  ]
+}
