@@ -22,7 +22,7 @@ void checkExample(int part, std::string_view example, std::string expected) {
 //     EXPECT_EQ(x.size(), 3u);
 // }
 TEST(Event2026Quest03, ConvertVoteToDecimal) {
-    const auto x = q2026_03::convertVoteToDecimalNotation("3210 7654");
+    const auto x = q2026_03::convertVoteToDecimalNotation("3210","7654");
     EXPECT_EQ(x, 222);
 }
 

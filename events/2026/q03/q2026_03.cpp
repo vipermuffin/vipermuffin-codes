@@ -8,42 +8,37 @@ namespace q2026_03 {
 
 // Shared parsing and core logic. The three parts usually build on one idea
 // and scale it up, so keep part1..3 thin and test the pieces from here.
-long convertVoteToDecimalNotation(const std::string_view votes) {
-    auto vals = vmc::split(votes," ");
-    long decimalVote{0};
+std::int64_t convertVoteToDecimalNotation(const std::string_view stdNum, const std::string_view votes) {
+    // auto vals = vmc::split(votes," ");
+    std::int64_t decimalVote{0};
 
-    auto digitItr = vals.back().rbegin();
-    auto multValItr = vals.front().rbegin();
+    auto digitItr = votes.rbegin();
+    auto multValItr = stdNum.rbegin();
     int mult = 0;
-    while(digitItr != vals.back().rend()) {
-        long digitVal = static_cast<long>(*digitItr - '0');
+    while(digitItr != votes.rend()) {
+        std::int64_t digitVal = static_cast<std::int64_t>(*digitItr - '0');
         int multVal = static_cast<int>(*multValItr - '0');
         
-        for(int j = mult; j > 0; --j) {
-            digitVal *= multVal;
-        }
+        std::ranges::for_each(std::views::iota(0,mult),
+        [&](const int){digitVal *= multVal;});
         decimalVote += digitVal;
-        digitItr++;
-        multValItr++;
-        mult++;
-        if(multValItr == vals.front().rend()) {
-            multValItr = vals.front().rbegin();
+        ++digitItr;
+        ++mult;
+        if(++multValItr == stdNum.rend()) {
+            multValItr = stdNum.rbegin();
         }
     }
     return decimalVote;
 }
 
 bool isValidIso2(const std::string_view votes) {
-    auto decimalVoteVal = convertVoteToDecimalNotation(votes);
+    auto vals = vmc::split(votes," ");
+    auto decimalVoteVal = convertVoteToDecimalNotation(vals.front(),vals.back());
     auto input = vmc::ints<int>(votes);
-    auto vals2Check = std::views::iota(1,input.back());
-    for(const auto x : vals2Check) {
-        auto dcv = convertVoteToDecimalNotation(std::format("{} {}",input.front(),x));
-        if(dcv == decimalVoteVal) {
-            return false;
-        }
-    }
-    return true;
+    return std::ranges::none_of(std::views::iota(1,input.back()),
+    [&](const int x ){
+        return convertVoteToDecimalNotation(vals.front(),std::to_string(x)) == decimalVoteVal;
+    });
 }
 }  // namespace q2026_03
 
@@ -53,31 +48,34 @@ using namespace q2026_03;
 
 vmc::Answer part1(std::string_view input) {
     auto lines = vmc::lines(input);
-    int totalDecimal{0};
+    std::int64_t totalDecimal{0};
     for(const auto line : lines) {
-        totalDecimal += q2026_03::convertVoteToDecimalNotation(line.substr(4));
+        auto vals = vmc::split(line.substr(4)," ");
+        totalDecimal += q2026_03::convertVoteToDecimalNotation(vals.front(),vals.back());
     }
-    return {std::to_string(totalDecimal)};
+    return {totalDecimal};
 }
 
 vmc::Answer part2(std::string_view input) {
     auto lines = vmc::lines(input);
-    long totalDecimal{0};
+    std::int64_t totalDecimal{0};
     for(const auto line : lines) {
-        totalDecimal += q2026_03::convertVoteToDecimalNotation(line.substr(4));
+        auto vals = vmc::split(line.substr(4)," ");
+        totalDecimal += q2026_03::convertVoteToDecimalNotation(vals.front(),vals.back());
     }
-    return {std::to_string(totalDecimal)};
+    return {totalDecimal};
 }
 
 vmc::Answer part3(std::string_view input) {
     auto lines = vmc::lines(input);
-    long totalDecimal{0};
+    std::int64_t totalDecimal{0};
     for(const auto line : lines) {
         if(isValidIso2(line.substr(5))) {
-            totalDecimal += q2026_03::convertVoteToDecimalNotation(line.substr(5));
+            auto vals = vmc::split(line.substr(5)," ");
+            totalDecimal += q2026_03::convertVoteToDecimalNotation(vals.front(),vals.back());
         }
     }
-    return {std::to_string(totalDecimal)};
+    return {totalDecimal};
 }
 
 }  // namespace

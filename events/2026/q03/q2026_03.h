@@ -4,8 +4,9 @@
 // and define them in q2026_03.cpp inside the same namespace.
 
 #include "vmc/vmc.h"
+#include <cstdint>
 
 namespace q2026_03 {
-long convertVoteToDecimalNotation(const std::string_view);
+std::int64_t convertVoteToDecimalNotation(const std::string_view,const std::string_view);
 bool isValidIso2(const std::string_view);
 }  // namespace q2026_03
