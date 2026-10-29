@@ -37,12 +37,7 @@ namespace q2026_02 {
         }
 
         bool isComplete() const {
-            for(const auto x : comp_vals) {
-                if(x == 0) {
-                    return false;
-                }
-            }
-            return true;
+            return std::ranges::none_of(comp_vals,[](const int x ){return x==0;});
         }
 
         bool operator<(const int compVal) const {
@@ -69,8 +64,7 @@ namespace q2026_02 {
             comp_vals[x-1] = 1;
         }
         int greaterThanCount() const {
-            auto gt = comp_vals | std::views::filter([](int x){return x==1;});
-            return std::accumulate(gt.begin(),gt.end(),0);
+            return std::ranges::count(comp_vals,1);
         }
         std::ranges::view auto getLessThansView() const {
             return std::views::iota(1,static_cast<int>(comp_vals.size()+1)) | std::views::filter([this](int x) {return this->comp_vals[x-1] == -1;});
