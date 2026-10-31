@@ -48,7 +48,7 @@ namespace {
 
 using namespace q2026_04;
 
-vmc::Answer part1([[maybe_unused]] std::string_view input) {
+vmc::Answer part1(std::string_view input) {
     auto lines = vmc::lines(input);
     std::vector<Result> results{};
     std::ranges::for_each(lines,[&](std::string_view sv){results.emplace_back(sv);});
@@ -87,7 +87,7 @@ vmc::Answer part2(std::string_view input) {
     return {ttime};
 }
 
-vmc::Answer part3([[maybe_unused]] std::string_view input) {
+vmc::Answer part3(std::string_view input) {
     auto lines = vmc::lines(input);
     std::vector<Result> results{};
     int maxQuests{0};
