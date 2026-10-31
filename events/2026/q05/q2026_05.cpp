@@ -2,7 +2,6 @@
 // Approach write-up: NOTES.md in this folder.
 
 #include "q2026_05.h"
-#include <iostream>
 #include <vector>
 #include <unordered_set>
 
@@ -26,10 +25,6 @@ void findLandCellsAndUpdateMap(vmc::CharGrid& landMap, const vmc::Point start) {
         // std::cout << newPoints.size() << std::endl;
         std::swap(points2Review,newPV);
     }
-}
-
-void findWaterCellsAndUpdateMap(vmc::CharGrid& landMap) {
-    std::ranges::for_each(landMap.points(),[&](const auto p){if(landMap[p] != '#') { landMap[p] = '.';}});
 }
 
 void findSandCellsAndUpdateMap(vmc::CharGrid& landMap) {
@@ -77,7 +72,7 @@ void findSandCellsAndUpdateMap(vmc::CharGrid& landMap) {
 void initTrees(vmc::CharGrid& landMap) {
     std::vector<vmc::Point> points2Review = landMap.findAll('#');
     std::ranges::for_each(points2Review,[&](const auto p){
-        if((p.r > 1) && (p.r < (landMap.rows()-1)) && (p.c > 1) && (p.c < landMap.cols()-1)) {
+        if((p.r > 1) && (p.r < (landMap.rows()-2)) && (p.c > 1) && (p.c < landMap.cols()-2)) {
             if(std::ranges::all_of(landMap.neighbours8(p),[&](const auto p2){return (landMap[p2] == '#' || landMap[p2] == '@') && std::ranges::all_of(landMap.neighbours4(p2),[&](const auto p3){return landMap[p3] == '#' || landMap[p3] == '@';});})) {
                 landMap[p] = '@';
             }
@@ -104,7 +99,7 @@ namespace {
 
 using namespace q2026_05;
 
-vmc::Answer part1([[maybe_unused]] std::string_view input) {
+vmc::Answer part1(std::string_view input) {
     vmc::CharGrid landMap = vmc::parseGrid(input);
     vmc::Point mapCenter{};
     mapCenter.r = landMap.rows()/2;
@@ -112,27 +107,11 @@ vmc::Answer part1([[maybe_unused]] std::string_view input) {
 
     landMap[mapCenter] = '#';
     findLandCellsAndUpdateMap(landMap, mapCenter);
-    // auto point2Review = landMap.neighbours8(mapCenter);
-    // while(!point2Review.empty()) {
-    //     //std::vector<vmc::Point> newPoints{};
-    //     std::unordered_set<vmc::Point> newPoints{};
-    //     std::ranges::for_each(point2Review, [&](const auto p) {
-    //         auto count = std::ranges::count_if(landMap.neighbours8(p),[&](const auto p2){return landMap[p2] == '#' || landMap[p2] == '1';});
-    //         if(count >= 5){
-    //             landMap[p]='#';
-    //             std::ranges::for_each(landMap.neighbours8(p),[&](const auto p2){if(landMap[p2] != '#') {newPoints.insert(p2);}});
-    //         }
-    //     });
-    //     std::vector<vmc::Point> newPV{};
-    //     std::ranges::for_each(newPoints,[&](const auto p){newPV.push_back(p);});
-    //     // std::cout << newPoints.size() << std::endl;
-    //     std::swap(point2Review,newPV);
-    // }
-    findWaterCellsAndUpdateMap(landMap);
+
     return {std::ranges::count_if(landMap.points(),[&](const auto p){return landMap[p] == '#';})};
 }
 
-vmc::Answer part2([[maybe_unused]] std::string_view input) {
+vmc::Answer part2(std::string_view input) {
     vmc::CharGrid landMap = vmc::parseGrid(input);
     vmc::Point mapCenter{};
     mapCenter.r = landMap.rows()/2;
@@ -144,7 +123,7 @@ vmc::Answer part2([[maybe_unused]] std::string_view input) {
     return {std::ranges::count_if(landMap.points(),[&](const auto p){return landMap[p] == '=';})};
 }
 
-vmc::Answer part3([[maybe_unused]] std::string_view input) {
+vmc::Answer part3(std::string_view input) {
     vmc::CharGrid landMap = vmc::parseGrid(input);
     vmc::Point mapCenter{};
     mapCenter.r = landMap.rows()/2;

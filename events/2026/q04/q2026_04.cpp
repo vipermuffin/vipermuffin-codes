@@ -3,8 +3,10 @@
 
 #include "q2026_04.h"
 #include <unordered_map>
+#include <array>
 #include <algorithm>
-
+#include <compare>
+#include <ranges>
 namespace q2026_04 {
 
 // Shared parsing and core logic. The three parts usually build on one idea
@@ -31,8 +33,8 @@ struct Participant {
     // bool operator<(const Participant& rhs) const {return  totalTime() < rhs.totalTime(); }
     std::strong_ordering operator<=>(const Participant rhs) const {
         if(auto c = rhs.completed <=> completed; c != 0) return c;
-        // if(auto c = totalTime() <=> rhs.totalTime(); c != 0) return c;
-        return totalTime() <=> rhs.totalTime();
+        if(auto c = totalTime() <=> rhs.totalTime(); c != 0) return c;
+        return id <=> rhs.id;
     }
     bool operator==(const Participant& rhs) const = default;
     int id;
@@ -52,23 +54,17 @@ vmc::Answer part1([[maybe_unused]] std::string_view input) {
     std::ranges::for_each(lines,[&](std::string_view sv){results.emplace_back(sv);});
 
     std::unordered_map<int,Participant> participants{};
-    std::ranges::for_each(results,[&](const Result& r) {if(participants.count(r.id_)==0) {participants[r.id_].id=r.id_;} participants[r.id_].addTime(r.part_, r.time_);});
-    std::vector<Participant> pv{};
-    std::ranges::for_each(participants,[&](const std::pair<int,Participant>& p){pv.push_back(p.second);});
+    std::ranges::for_each(results,[&](const Result& r) {participants.try_emplace(r.id_,r.id_);participants[r.id_].addTime(r.part_, r.time_);});
+    auto vals = participants | std::views::values;
+    std::vector<Participant> pv{vals.begin(),vals.end()};
+    // std::ranges::for_each(participants,[&](const std::pair<int,Participant>& p){pv.push_back(p.second);});
+    // Sort using <=>
     std::ranges::sort(pv);
     
     int ttime = 0;
     int i=1;
     std::ranges::for_each(pv,[&](const Participant& p){ttime += p.totalTime()*i++;});
-        
-    // std::vector<int> times(results.size()/3,0);
-    // std::ranges::for_each(results,[&](const Result& r){times[r.id_-1]+=r.time_;});
-    // std::ranges::sort(times);
-    // for(auto i = 0; i < times.size();++i) {
-    //     times[i] *= (i+1); std::cout << std::format("{},{},{}\n",p.id,p.completed,p.totalTime());
-    // }
-    
-    // return {std::accumulate(times.begin(), times.end(),0)};
+
     return {ttime};
 }
 
@@ -79,10 +75,10 @@ vmc::Answer part2(std::string_view input) {
 
     std::unordered_map<int,Participant> participants{};
     std::ranges::for_each(results,[&](const Result& r) {if(participants.count(r.id_)==0) {participants[r.id_].id=r.id_;} participants[r.id_].addTime(r.part_, r.time_);});
-    std::vector<Participant> pv{};
-    std::ranges::for_each(participants,[&](const std::pair<int,Participant>& p){pv.push_back(p.second);});
-    std::ranges::sort(pv);
-    
+    auto vals = participants | std::views::values;
+    std::vector<Participant> pv{vals.begin(),vals.end()};
+    // Sort using a projection
+    std::ranges::sort(pv, {}, [](const Participant& p){ return std::tuple(-p.completed, p.time);});
     int ttime = 0;
     int i=1;
     
