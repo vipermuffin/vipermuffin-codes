@@ -3,8 +3,11 @@
 // so keep the input string alive while you use them.
 
 #include <cctype>
+#include <cstddef>
 #include <charconv>
+#include <optional>
 #include <string_view>
+#include <type_traits>
 #include <vector>
 
 namespace vmc {
@@ -91,6 +94,24 @@ T toInt(std::string_view s) {
     T v{};
     std::from_chars(s.data(), s.data() + s.size(), v);
     return v;
+}
+
+// Consumes "key=<integer>" from the front of sv, plus one trailing space if present.
+template <typename T = int>
+    requires std::is_integral_v<T>
+std::optional<T> parse_field(std::string_view& sv, std::string_view key) {
+    if (!sv.starts_with(key)) return std::nullopt;
+    sv.remove_prefix(key.size());
+    if (sv.empty() || sv.front() != '=') return std::nullopt;
+    sv.remove_prefix(1);
+
+    T value{};
+    auto [ptr, ec] = std::from_chars(sv.data(), sv.data() + sv.size(), value);
+    if (ec != std::errc{}) return std::nullopt;
+    sv.remove_prefix(static_cast<std::size_t>(ptr - sv.data()));
+
+    if (!sv.empty() && sv.front() == ' ') sv.remove_prefix(1);
+    return value;
 }
 
 }  // namespace vmc
