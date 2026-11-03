@@ -2,23 +2,24 @@
 // Approach write-up: NOTES.md in this folder.
 
 #include "q2026_06.h"
+#include <algorithm>
 #include <cassert>
 #include <unordered_map>
+#include <unordered_set>
 #include <ranges>
 
-using namespace std;
 namespace q2026_06 {
 
 // Shared parsing and core logic. The three parts usually build on one idea
 // and scale it up, so keep part1..3 thin and test the pieces from here.
-using IngredientMap = unordered_map<string_view, std::pair<vector<string_view>,vector<string_view>>>;
+using IngredientMap = std::unordered_map<std::string_view, std::pair<std::vector<std::string_view>,std::vector<std::string_view>>>;
 
 IngredientMap buildIMap(std::string_view input) {
-    unordered_map<string_view, std::pair<vector<string_view>,vector<string_view>>> ingredientMap{};
+    IngredientMap ingredientMap{};
     auto lines = vmc::lines(input);
     for(const auto& line : lines) {
         auto tmp = vmc::split(line, ":");
-        assert(tmp.size() != 2);
+        assert(tmp.size() == 2);
         auto item = tmp.front();
         auto madeFrom = vmc::split(tmp.back(), ",");
         for(const auto& ingredient : madeFrom) {
@@ -29,20 +30,18 @@ IngredientMap buildIMap(std::string_view input) {
     return ingredientMap;
 }
 
-unordered_map<string_view, bool> findUsedList(const string_view searchItem, const IngredientMap& ingredientMap, bool backwards = false) {
-    vector<string_view> valsList{searchItem};
-    unordered_map<string_view, bool> list{{searchItem,true}};
+std::unordered_set<std::string_view> findUsedList(const std::string_view searchItem, const IngredientMap& ingredientMap, bool backwards = false) {
+    std::vector<std::string_view> valsList{searchItem};
+    std::unordered_set<std::string_view> list{searchItem};
     while(!valsList.empty()) {
-        vector<string_view> newList{};
-        for(const auto& val : valsList) {
-            for(const auto& i : backwards ? ingredientMap.at(val).second : ingredientMap.at(val).first) {
-                if(!list[i]) {
-                    newList.push_back(i);
-                    list[i] = true;
-                }
+        auto val = valsList.back();
+        valsList.pop_back();
+        const auto& [ingredients, usedIn] = ingredientMap.at(val);
+        for(const auto next : backwards ? usedIn : ingredients) {
+            if(list.insert(next).second) {
+                valsList.push_back(next);
             }
         }
-        std::swap(valsList,newList);
     }
 
     return list;
@@ -74,17 +73,14 @@ vmc::Answer part2(std::string_view input) {
 vmc::Answer part3(std::string_view input) {
     auto ingredientMap = buildIMap(input);
 
-    unordered_map<string_view, bool> list{};
-    for(const auto& item : ingredientMap) {
-        if(item.first.find("NULL") == std::string_view::npos) {
-            auto iList = findUsedList(item.first, ingredientMap);
-            if(std::ranges::count_if(iList,[](const auto& x) {return x.first.find("NULL") != std::string_view::npos;}) > 1) {
-                list[item.first] = true;
-            }
-        }
+    std::unordered_map<std::string_view, int> badItems{};
+    auto isNull = [](std::string_view k) { return k.starts_with("NULL");};
+    auto nullVals = ingredientMap | std::views::keys | std::views::filter(isNull);
+    for(const auto& item : nullVals) {
+        auto iList = findUsedList(item, ingredientMap, true);
+        for( auto x : iList) {++badItems[x];}
     }
-
-    return {list.size()};
+    return {std::ranges::count_if(badItems,[&](const auto& entry){ const auto& [name, count] = entry; return !isNull(name) && count > 1;})};
 }
 
 }  // namespace
