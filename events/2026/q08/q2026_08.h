@@ -4,8 +4,9 @@
 // and define them in q2026_08.cpp inside the same namespace.
 
 #include "vmc/vmc.h"
+#include <unordered_map>
 
 namespace q2026_08 {
-    int calcLineEnergy(const std::vector<int>&);
+    int calcLineEnergy(const std::vector<int>&, const std::unordered_map<vmc::Point, int>&);
 
 }  // namespace q2026_08

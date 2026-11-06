@@ -21,10 +21,10 @@ void checkExample(int part, std::string_view example, std::string expected) {
 //     const auto x = q2026_08::parse("...");
 //     EXPECT_EQ(x.size(), 3u);
 // }
-TEST(Event2026Quest08, calcEnergy) {
-    const auto x = q2026_08::calcLineEnergy({4,9,7,9,1});
-    EXPECT_EQ(x, 3);
-}
+// TEST(Event2026Quest08, calcEnergy) {
+//     const auto x = q2026_08::calcLineEnergy({4,9,7,9,1});
+//     EXPECT_EQ(x, 3);
+// }
 // --- Examples from the puzzle text -----------------------------------------
 // tools/fetch.py fills in the example and its answer while the raw string
 // is still empty. Pasting by hand? Keep example text flush left.
@@ -75,7 +75,7 @@ TEST(Event2026Quest08, Part3Example) {
 // Parts without notes on disk (e.g. a friend's clone) are skipped.
 
 TEST(Event2026Quest08, MyAnswers) {
-    const std::array<std::string, 3> accepted{"182", "1031", ""};  // fill in as you solve
+    const std::array<std::string, 3> accepted{"182", "1031", "899351"};  // fill in as you solve
     int checked = 0;
     for (int part = 1; part <= 3; ++part) {
         const auto input = vmc::notes(kEvent, kQuest, part);

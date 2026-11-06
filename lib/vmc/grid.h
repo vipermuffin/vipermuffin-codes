@@ -103,13 +103,13 @@ private:
 using CharGrid = Grid<char>;
 
 // Ragged lines are padded with `pad` to the widest line.
-inline CharGrid parseGrid(std::string_view text, char pad = ' ') {
+inline CharGrid parseGrid(std::string_view text, char pad = ' ', bool rowReversed = false, bool colReversed = false) {
     const auto ls = lines(text);
     std::size_t width = 0;
     for (auto l : ls) width = std::max(width, l.size());
     CharGrid g(static_cast<int>(ls.size()), static_cast<int>(width), pad);
     for (int r = 0; r < g.rows(); ++r)
-        for (int c = 0; c < static_cast<int>(ls[r].size()); ++c) g[{r, c}] = ls[r][c];
+        for (int c = 0; c < static_cast<int>(ls[r].size()); ++c) g[{colReversed ? g.rows() - 1 - r : r, c}] =  ls[r][rowReversed ? ls[r].size() - c - 1 : c];
     return g;
 }
 

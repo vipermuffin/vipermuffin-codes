@@ -2,137 +2,118 @@
 // Approach write-up: NOTES.md in this folder.
 
 #include "q2026_08.h"
-#include <vector>
+#include <array>
 #include <iostream>
+#include <ranges>
+#include <functional>
+#include <vector>
+#include <unordered_map>
+#include <format>
+
 namespace q2026_08 {
 
 // Shared parsing and core logic. The three parts usually build on one idea
 // and scale it up, so keep part1..3 thin and test the pieces from here.
 //Generic Debug Functions
-template <class T>
-void printVector(const std::vector<T>& v) {
-    std::cout << "v = {";
-    auto x  = v.begin();
-    if(x>= v.end()) {
-        std::cout << "}";
-    }
-    while(x < v.end()) {
-        std::cout << *x++ << (x==v.end() ? "}" : ",");
-    }
-    std::cout << std::endl;
-}
 
-std::vector<std::vector<int>> buildLines(std::string_view input, int direction = 0) {
-    auto g = vmc::parseGrid(input,'.', direction % 2 == 1, direction > 2);
-    // std::cout << vmc::toString(g);
-    std::vector<std::vector<int>> entRows{};
 
-    auto op = [&](const vmc::Point p){
-        switch(direction%3) {
-            case 0:
-            case 1:
-                return p+vmc::DOWN+vmc::RIGHT;
-            
-            case 2:
-                return p+vmc::RIGHT;
-        }
-        return p;
+std::vector<std::vector<vmc::Point>> buildLines(std::string_view input, std::unordered_map<vmc::Point, int>& entDb, int direction = 0) {
+    auto g = vmc::parseGrid(input,'.', false, false);
+
+    std::vector<std::vector<vmc::Point>> entRows{};
+    auto rIdx = std::views::iota(0,g.rows());
+    auto cIdx = std::views::iota(0,g.cols());
+    std::array<std::function<int(int)>,6> rOp = {
+        [](int i) {return i+1;},
+        [](int i) {return i+1;},
+        [](int i) {return i;},
+        [&](int i) {return g.rows()-2-i;},
+        [&](int i) {return g.rows()-2-i;},
+        [&](int i) {return g.rows()-1-i;}
+    };
+    std::array<std::function<int(int)>,6> cOp = {
+        [](int i) {return i;},
+        [&](int i) {return g.cols()-1-i;},
+        [&](int) {return g.cols();},
+        [&](int i) {return g.cols()-1-i;},
+        [](int i) {return i;},
+        [&](int) {return g.cols();}
+    };
+    std::array<std::function<vmc::Point(vmc::Point)>,6> nextP = {
+        [](vmc::Point pc) {return pc+vmc::DOWN+vmc::RIGHT;},
+        [](vmc::Point pc) {return pc+vmc::DOWN+vmc::LEFT;},
+        [](vmc::Point pc) {return pc+vmc::LEFT;}, 
+        [](vmc::Point pc) {return pc+vmc::UP+vmc::LEFT;},
+        [](vmc::Point pc) {return pc+vmc::UP+vmc::RIGHT;},
+        [](vmc::Point pc) {return pc+vmc::RIGHT;},
     };
 
-    for(int i = 0; direction%3 < 2 && i < g.cols();++i) {
-        std::vector<int> vals{};
-        vmc::Point p{0,i};
+    std::array<int,6> rowVal = {0,0,0,g.rows()-1,g.rows()-1,g.rows()-1};
+    std::array<int,6> colVal = {0,g.cols()-1,g.cols()-1,g.cols()-1,0,0};
+    
+
+    for(int i  : cIdx  | std::views::transform(cOp[direction])) {
+        std::vector<vmc::Point> vals{};
+        vmc::Point p{rowVal[direction],i};
         while(g.get(p,'-') != '-') {
             if(g[p] != '.') {
-                vals.push_back(static_cast<int>(g[p]-'0'));
+                vals.push_back(p);
+                entDb[p] = static_cast<int>(g[p]-'0');
             }
-            p = op(p);
+            p = nextP[direction](p);
         }
         if(!vals.empty()) entRows.push_back(vals);
     }
-
-    for(int i = direction%3 == 2 ? 0 : 1; i < g.cols();++i) {
-        std::vector<int> vals{};
-        vmc::Point p{i,0};
+    
+    
+    for(int i : rIdx | std::views::transform(rOp[direction])) {
+        std::vector<vmc::Point> vals{};
+        vmc::Point p{i,colVal[direction]};
         while(g.get(p,'-') != '-') {
             if(g[p] != '.') {
-                vals.push_back(static_cast<int>(g[p]-'0'));
+                vals.push_back(p);
+                entDb[p] = static_cast<int>(g[p]-'0');
             }
-            p = op(p);
+            p = nextP[direction](p);
         }
+
         if(!vals.empty()) entRows.push_back(vals);
     }
 
-    // for(const auto& v : entRows) {
-    //     printVector(v);
-    // }
     return entRows;
 }
 
-// std::vector<std::vector<int>> buildLines(std::string_view input) {
-//     auto g = vmc::parseGrid(input,'.');
-//     // std::cout << vmc::toString(g);
-//     std::vector<std::vector<int>> entRows{};
-
-//     for(int i = 0; i < g.cols();++i) {
-//         std::vector<int> vals{};
-//         for(int j = 0; i+j < g.rows() && j < g.cols();++j) {
-//             vmc::Point p{i+j,j};
-//             if(g[p] != '.') {
-//                 vals.push_back(static_cast<int>(g[p]-'0'));
-//             }
-//         }
-//         if(!vals.empty()) entRows.push_back(vals);
-//     }
-
-//         for(int i = 1; i < g.cols();++i) {
-//         std::vector<int> vals{};
-//         for(int j = 0; j < g.rows() && i+j < g.cols();++j) {
-//             vmc::Point p{j,i+j};
-//             if(g[p] != '.') {
-//                 vals.push_back(static_cast<int>(g[p]-'0'));
-//             }
-//         }
-//         if(!vals.empty()) entRows.push_back(vals);
-//     }
-
-//     // for(const auto& v : entRows) {
-//     //     printVector(v);
-//     // }
-//     return entRows;
-// }
-
-int calcLineEnergy(const std::vector<int>& entLine) {
+int calcLineEnergy(const std::vector<vmc::Point>& entLine, const std::unordered_map<vmc::Point, int>& entDb) {
     int energy{0};
     int shadowHeight = 0;
 
     for(const auto val : entLine) {
-        if(val > shadowHeight) {
+        if(entDb.at(val) > shadowHeight) {
             ++energy;
-            shadowHeight = val;
+            shadowHeight = entDb.at(val);
         }
         --shadowHeight;
     }
     return energy;
 }
 
-std::pair<int,int> calcLineEnergy2(std::vector<int>& entLine) {
+std::pair<int,int> calcLineEnergy2(std::vector<vmc::Point>& entLine, std::unordered_map<vmc::Point, int>& entDb) {
     int energy{0};
     int warriorCnt{0};
     int shadowHeight = 0;
 
     for(auto& val : entLine) {
-        if(val > shadowHeight) {
+        if(entDb.at(val) < 1) {
+            ++entDb[val];
+        } else if(entDb.at(val) > shadowHeight) {
             ++energy;
-            shadowHeight = val;
-            if(++val > 9) {
-                val = -2;
+            shadowHeight = entDb.at(val);
+            if(++entDb[val] > 9) {
+                entDb[val] = -2;
                 ++warriorCnt;
             }
         }
-        if(val < 1) {
-            ++val;
-        }
+        
         if(--shadowHeight < 0) {
             shadowHeight = 0;
         }
@@ -146,22 +127,24 @@ namespace {
 using namespace q2026_08;
 
 vmc::Answer part1(std::string_view input) {
-    auto ents = buildLines(input);
+    std::unordered_map<vmc::Point, int> entDb{};
+    auto ents = buildLines(input, entDb);
     auto energy = 0;
     for(const auto& el : ents) {
-        energy += calcLineEnergy(el);
+        energy += calcLineEnergy(el, entDb);
     }
     return {energy};
 }
 
 vmc::Answer part2(std::string_view input) {
     auto energy = 0;
+    std::unordered_map<vmc::Point, int> entDb{};
     
     for(int i = 0; i < 6; ++i) {
-        auto ents = buildLines(input,i);
+        auto ents = buildLines(input,entDb,i);
     
         for(const auto& el : ents) {
-            energy += calcLineEnergy(el);
+            energy += calcLineEnergy(el, entDb);
         }
     }
 
@@ -171,26 +154,25 @@ vmc::Answer part2(std::string_view input) {
 vmc::Answer part3([[maybe_unused]] std::string_view input) {
     auto energy = 0;
     auto warriors = 0;
-    std::vector<std::vector<std::vector<int>>> entDirs;
+    std::vector<std::vector<std::vector<vmc::Point>>> entDirs;
+    std::unordered_map<vmc::Point, int> entDb{};
     for(int i = 0; i < 6; ++i) {
-        auto ents = buildLines(input,i);
+        auto ents = buildLines(input,entDb,i);
         entDirs.push_back(ents);
     }
     int direction = 0;
-    int rounds = 0;
     while(warriors < 100000) {
         for(auto& ents : entDirs[direction]) {
-            auto [e,w] = calcLineEnergy2(ents);
+            auto [e,w] = calcLineEnergy2(ents,entDb);
             energy += e;
             warriors += w;
         }
         if(++direction >= 6) {
             direction = 0;
         }
-        ++rounds;
     }
 
-    return {rounds};
+    return {energy};
 }
 
 }  // namespace
