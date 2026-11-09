@@ -35,10 +35,11 @@ struct Plant {
 
 int64_t simulateGrowth(const Plant& p, bool leafAlgorithm = false) {
     int64_t numBranches = 0;
-    int64_t simTime = 0;
-    int64_t totalSize = 0;
-    std::map<int64_t,int64_t> branches{{0,1}};
-    int64_t step = leafAlgorithm ? p.growth_ : 1;
+    //Need to start at 1 in case the limit is 1 so I don't jump over
+    int64_t simTime = 1;
+    int64_t totalSize = 1;
+    std::map<int64_t,int64_t> branches{{1,1}};
+    int64_t step = leafAlgorithm ? p.growth_-1 : 1;
     while(totalSize < p.limit_) {
         std::map<int64_t,int64_t> newBranches{};
         int64_t nextStep = leafAlgorithm ? p.growth_/2+1 : 1;
@@ -66,47 +67,12 @@ int64_t simulateGrowth(const Plant& p, bool leafAlgorithm = false) {
         }
         
         simTime += step;
-        // if(leafAlgorithm && p.limit_ - totalSize <= nextStep*(totalSize+numBranches)) {
-        //     nextStep = p.limit_ - totalSize - 1;
-        // }
-        // std::cout << std::format("Second {}:Size {}:HashMapSize {}\n",simTime,totalSize,newBranches.size());
         std::swap(branches,newBranches);
         std::swap(step,nextStep);
     }
 
     return simTime;
 }
-
-// int64_t simulateGrowth(const Plant& p, bool leafAlgorithm = false) {
-//     int64_t numBranches = 0;
-//     int64_t simTime = 0;
-//     int64_t totalSize = 0;
-//     std::unordered_map<int64_t,int64_t> branches{{0,1}};
-//     while(totalSize < p.limit_) {
-//         std::unordered_map<int64_t,int64_t> newBranches{};
-//         for(auto [sz,numB] : branches) {
-//             auto sizeB = sz;
-//             if(++sizeB == p.growth_) {
-//                 numBranches += numB;
-//                 newBranches[sizeB/2] += numB*2;
-//                 newBranches[1] += numB;
-//             } else {
-//                 newBranches[sizeB] += numB;
-//             }
-//         }
-//         if(leafAlgorithm) { 
-//             totalSize = std::accumulate(newBranches.begin(),newBranches.end(),-numBranches, [](const auto sum, const auto kvp){return sum + kvp.second;});
-//         } else {
-//             totalSize = std::accumulate(newBranches.begin(),newBranches.end(),numBranches, [](const auto sum, const auto kvp){return sum + kvp.first*kvp.second;});
-//         }
-        
-//         ++simTime;
-//         // std::cout << std::format("Second {}:Size {}\n",simTime,totalSize);
-//         std::swap(branches,newBranches);
-//     }
-
-//     return simTime;
-// }
 
 }  // namespace q2026_09
 
@@ -148,7 +114,7 @@ vmc::Answer part3([[maybe_unused]] std::string_view input) {
     return {total};
 }
 
-// vmc::Answer part2([[maybe_unused]] std::string_view input) {
+// vmc::Answer part3_async([[maybe_unused]] std::string_view input) {
     
 //     std::vector<std::future<int64_t>> futures;
 //     for(auto line : vmc::lines(input)) {
@@ -162,23 +128,6 @@ vmc::Answer part3([[maybe_unused]] std::string_view input) {
 //     }
 
 //     return {total};
-// }
-
-// vmc::Answer part3([[maybe_unused]] std::string_view input) {
-    
-//     std::vector<std::future<int64_t>> futures;
-//     for(auto line : vmc::lines(input)) {
-//         Plant p{line};
-//         futures.push_back(std::async(std::launch::async, simulateGrowth,p,true));
-//     }
-
-//     int64_t total{0};
-//     for(auto& f : futures) {
-//         total += f.get();
-//     }
-
-//     return {total};
-//     //838385366905091 first char and length is correct
 // }
 
 }  // namespace

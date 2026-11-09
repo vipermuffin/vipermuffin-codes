@@ -44,14 +44,17 @@ id=3, growth=7, limit=30
 
 TEST(Event2026Quest09, Part3Example) {
     checkExample(3, R"EX(
-)EX", "");
+id=1, growth=3, limit=10
+id=2, growth=5, limit=20
+id=3, growth=7, limit=30
+)EX", "42");
 }
 
 // --- Your accepted answers: a regression check for refactoring --------------
 // Parts without notes on disk (e.g. a friend's clone) are skipped.
 
 TEST(Event2026Quest09, MyAnswers) {
-    const std::array<std::string, 3> accepted{"218", "15438", ""};  // fill in as you solve
+    const std::array<std::string, 3> accepted{"218", "15438", "838385366905089"};  // fill in as you solve
     int checked = 0;
     for (int part = 1; part <= 3; ++part) {
         const auto input = vmc::notes(kEvent, kQuest, part);
