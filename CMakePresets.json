@@ -21,11 +21,11 @@
     }
   ],
   "buildPresets": [
-    { "name": "release", "configurePreset": "release" },
-    { "name": "debug", "configurePreset": "debug" }
+    { "name": "release", "configurePreset": "release", "jobs": 0 },
+    { "name": "debug", "configurePreset": "debug", "jobs": 0 }
   ],
   "testPresets": [
-    { "name": "release", "configurePreset": "release", "output": { "outputOnFailure": true } },
-    { "name": "debug", "configurePreset": "debug", "output": { "outputOnFailure": true } }
+    { "name": "release", "configurePreset": "release", "execution": { "jobs": 0 }, "output": { "outputOnFailure": true } },
+    { "name": "debug", "configurePreset": "debug", "execution": { "jobs": 0 }, "output": { "outputOnFailure": true } }
   ]
 }
